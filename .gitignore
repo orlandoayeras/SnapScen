@@ -1,0 +1,43 @@
+# ==========================================
+# 1. BackstopJS / Testing Artifacts
+# ==========================================
+# Ignore the actual test screenshots and generated HTML visual reports
+backstop_data/bitmaps_test/
+backstop_data/html_report/
+
+
+# ==========================================
+# 2. Dependency & Environment Directories
+# ==========================================
+node_modules/
+jspm_packages/
+.pnp/
+.pnp.js
+
+
+# ==========================================
+# 3. Build & Output Files
+# ==========================================
+dist/
+build/
+.cache/
+
+
+# ==========================================
+# 4. Operating System & IDE Garbage
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+
+# ==========================================
+# 5. Logs and Runtime Data
+# ==========================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.local
