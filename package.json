@@ -1,0 +1,23 @@
+{
+  "name": "snapscen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/orlandoayeras/SnapScen.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/orlandoayeras/SnapScen/issues"
+  },
+  "homepage": "https://github.com/orlandoayeras/SnapScen#readme",
+  "devDependencies": {
+    "backstopjs": "^6.3.25"
+  }
+}
