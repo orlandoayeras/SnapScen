@@ -11,25 +11,10 @@ if (!fs.existsSync(configPath)) {
 const site = require(configPath);
 const targetBase = site.targetBase || null;
 
-// Determine custom onReadyScript path
+// Hardcoded default onReadyScript and onBeforeScript path (can be overridden by site-specific config)
 const customOnReadyPath = path.resolve(__dirname, 'backstop_data', 'onReady.js');
-let onReadyScript;
-if (fs.existsSync(customOnReadyPath)) {
-  onReadyScript = customOnReadyPath;
-} else {
-  onReadyScript = 'playwright/default.onReady.js';
-}
-console.log('Resolved onReadyScript path:', onReadyScript);
-
-// Determine custom onBeforeScript path
 const customOnBeforePath = path.resolve(__dirname, 'backstop_data', 'onBefore.js');
-let onBeforeScript;
-if (fs.existsSync(customOnBeforePath)) {
-  onBeforeScript = customOnBeforePath;
-} else {
-  onBeforeScript = 'playwright/default.onBefore.js';
-}
-console.log('Resolved onBeforeScript path:', onBeforeScript);
+
 
 // This will build scenarios from pages
 
