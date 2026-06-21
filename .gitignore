@@ -4,6 +4,7 @@
 # Ignore the actual test screenshots and generated HTML visual reports
 backstop_data/bitmaps_test/
 backstop_data/html_report/
+backstop_data/bitmaps_reference/
 
 
 # ==========================================

@@ -12,8 +12,8 @@ const site = require(configPath);
 const targetBase = site.targetBase || null;
 
 // Hardcoded default onReadyScript and onBeforeScript path (can be overridden by site-specific config)
-const customOnReadyPath = path.resolve(__dirname, 'backstop_data', 'onReady.js');
-const customOnBeforePath = path.resolve(__dirname, 'backstop_data', 'onBefore.js');
+const OnReadyPath = path.resolve(__dirname, 'backstop_data', 'onReady.js');
+const OnBeforePath = path.resolve(__dirname, 'backstop_data', 'onBefore.js');
 
 
 // This will build scenarios from pages
@@ -64,9 +64,13 @@ module.exports = {
   },
   report: ['browser'],
   engine: 'playwright',
+  engineOptions: {
+    browser: 'chromium',
+    args: ['--no-sandbox', '--disable-cache'],
+  },
 
-  onBeforeScript,
-  onReadyScript,
+  onBeforeScript: OnBeforePath,
+  onReadyScript: OnReadyPath,
 
   asyncCaptureLimit: 5,
   asyncCompareLimit: 50,

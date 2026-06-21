@@ -18,6 +18,21 @@ module.exports = async (page, scenario, vp) => {
     }
   }
 
+  // Force lazy images to load eagerly before scrolling
+  await page.evaluate(() => {
+    document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+      img.setAttribute('loading', 'eager');
+    });
+  });
+
+  // Handle data-src style lazy loaders
+  await page.evaluate(() => {
+    document.querySelectorAll('img[data-src], img[data-lazy-src], img[data-lazy]').forEach(img => {
+      const src = img.dataset.src || img.dataset.lazySrc || img.dataset.lazy;
+      if (src) img.src = src;
+    });
+  });
+
   // Scroll through the page to trigger lazy-loaded images and content
   const bodyHandle = await page.$('body');
   const { height } = await bodyHandle.boundingBox();
@@ -26,10 +41,18 @@ module.exports = async (page, scenario, vp) => {
   let scrolled = 0;
   while (scrolled + viewportHeight < height) {
     await page.evaluate(h => window.scrollBy(0, h), viewportHeight);
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
     scrolled += viewportHeight;
   }
   await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(() => {
+    return Array.from(document.querySelectorAll('img')).every(img =>
+      img.complete && (img.naturalWidth > 0 || img.src === '' || img.src.startsWith('data:'))
+    );
+  }, { timeout: 15000 }).catch(() => {
+    console.warn(`[${scenario.label}] Some images failed to load within 15 seconds`);
+  });
   await page.waitForTimeout(300);
 
   // Stop all running intervals — prevents animation-driven content from shifting between captures

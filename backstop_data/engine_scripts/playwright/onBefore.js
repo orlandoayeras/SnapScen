@@ -26,7 +26,13 @@ module.exports = async (page, scenario, vp) => {
     if (blocklist.some(domain => url.includes(domain))) {
       return route.abort();
     }
-    route.continue();
+    route.continue({
+      headers: {
+        ...route.request().headers(),
+        'Cache-Control': 'no-cache, no-store',
+        'Pragma': 'no-cache',
+      }
+    });
   });
 
   // Load cookies from a JSON file if cookiePath is set on the scenario.

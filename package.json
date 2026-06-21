@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "reference": "backstop --config=backstop.config.js reference",
+    "test": "backstop --config=backstop.config.js test",
+    "approve": "backstop --config=backstop.config.js approve",
+    "open-report": "backstop --config=backstop.config.js open-report",
+    "vrt": "npm run reference && npm run test",
+    "dev": "node web.server.js"
   },
   "repository": {
     "type": "git",
