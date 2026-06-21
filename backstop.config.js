@@ -22,7 +22,7 @@ const defaultReferenceBase = site.referenceBase || targetBase;
 
 // Resolve misMatchThreshold per scenario.
 const DEFAULT_THRESHOLD = 1.0;
-const envThreshold = null; // Placeholder for future CLI/env threshold parsing logic
+const envThreshold = process.env.SNAPSCEN_THRESHOLD ? Number(process.env.SNAPSCEN_THRESHOLD) : null;
 
 function resolveThreshold(page) {
   if (envThreshold !== null && Number.isFinite(envThreshold)) return envThreshold;

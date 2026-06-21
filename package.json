@@ -27,5 +27,8 @@
   },
   "dependencies": {
     "commander": "^15.0.0"
+  },
+  "bin": {
+    "snapscen": "cli/index.js"
   }
 }
