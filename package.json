@@ -24,5 +24,8 @@
   "homepage": "https://github.com/orlandoayeras/SnapScen#readme",
   "devDependencies": {
     "backstopjs": "^6.3.25"
+  },
+  "dependencies": {
+    "commander": "^15.0.0"
   }
 }
