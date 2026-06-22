@@ -182,7 +182,7 @@ function openComparison(idx) {
   // Images
   const ref  = s.images?.reference || '';
   const test = s.images?.test      || '';
-  const diff = s.images?.diff      || '';
+  const diff = state !== 'pass' ? (s.images?.diff || '') : '';
 
   document.getElementById('lb-ref-s').src  = ref;
   document.getElementById('lb-test-s').src = test;
@@ -197,12 +197,15 @@ function openComparison(idx) {
     diffMissing.style.display = 'none';
   } else {
     diffImg.style.display = 'none';
+    diffMissing.textContent = state === 'pass'
+      ? 'No diff image available (this page passed).'
+      : 'No diff image available.';
     diffMissing.style.display = 'flex';
   }
 
   // Diff button
   const diffBtn  = document.getElementById('btn-diff');
-  diffBtn.disabled = !diff;
+  diffBtn.disabled = false;
 
   // Footer URLs
   const refUrlEl  = document.getElementById('lb-ref-url');
