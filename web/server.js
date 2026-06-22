@@ -12,7 +12,7 @@ const snapscenConfigPath = path.resolve(__dirname, '..', 'snapscen.config.js');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/report', express.static(path.resolve(__dirname, '..', 'backstop_data', 'html_report')));
 
-app.get('api/config', (req, res) => {
+app.get('/api/config', (req, res) => {
     try {
         delete require.cache[require.resolve(snapscenConfigPath)];
         const config = require(snapscenConfigPath);
@@ -39,7 +39,7 @@ app.get('/api/run/:command', (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    const send = (type, data) => res.write(`data: ${JSON.stringify({ type, data })}\n\n`);
+    const send = (type, text) => res.write(`data: ${JSON.stringify({ type, text })}\n\n`);
     const done = code => {
         res.write(`data: ${JSON.stringify({ type: 'done', code })}\n\n`);
         res.end();
@@ -47,14 +47,14 @@ app.get('/api/run/:command', (req, res) => {
 
     if (command === 'vrt') {
         const ref = spawnBackstop('reference');
-        ref.stdout.on('data', d => send('reference', d.toString()));
-        ref.stderr.on('data', d => send('reference', d.toString()));
+        ref.stdout.on('data', d => send('stdout', d.toString()));
+        ref.stderr.on('data', d => send('stderr', d.toString()));
         ref.on('close', code => {
             if (code !== 0) return done(code);
             send('info', '\n--- Running test ---\n');
             const test = spawnBackstop('test');
-            test.stdout.on('data', d => send('test', d.toString()));
-            test.stderr.on('data', d => send('test', d.toString()));
+            test.stdout.on('data', d => send('stdout', d.toString()));
+            test.stderr.on('data', d => send('stderr', d.toString()));
             test.on('close', done);
             req.on('close', () => test.kill());
         });
