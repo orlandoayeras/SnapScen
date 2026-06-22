@@ -9,7 +9,8 @@
     "approve": "backstop --config=backstop.config.js approve",
     "open-report": "backstop --config=backstop.config.js open-report",
     "vrt": "npm run reference && npm run test",
-    "dev": "node web/server.js"
+    "dev": "node web/server.js",
+    "postinstall": "npx playwright install chromium"
   },
   "repository": {
     "type": "git",
