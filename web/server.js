@@ -11,7 +11,8 @@ const configPath = path.resolve(__dirname, '..', 'backstop.config.js');
 const snapscenConfigPath = path.resolve(__dirname, '..', 'snapscen.config.js');
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/report', express.static(path.resolve(__dirname, '..', 'backstop_data', 'html_report')));
+app.use('/backstop_data', express.static(path.resolve(__dirname, '..', 'backstop_data')));
+app.get('/report', (req, res) => res.sendFile(path.join(__dirname, 'public', 'report.html')));
 app.use(express.json());
 
 app.get('/api/config', (req, res) => {
@@ -104,6 +105,54 @@ app.post('/api/config', (req, res) => {
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/report', (req, res) => {
+    const testDir = path.resolve(__dirname, '..', 'backstop_data', 'bitmaps_test');
+
+    if (!fs.existsSync(testDir)) {
+      return res.status(404).json({ error: 'No test runs found. Run snapscen test first.' });
+    }
+
+    const runs = fs.readdirSync(testDir)
+      .filter(d => fs.statSync(path.join(testDir, d)).isDirectory())
+      .sort()
+      .reverse();
+
+    if (!runs.length) {
+      return res.status(404).json({ error: 'No test runs found. Run snapscen test first.' });
+    }
+
+    const latestRun = runs[0];
+    const reportPath = path.join(testDir, latestRun, 'report.json');
+
+    if (!fs.existsSync(reportPath)) {
+      return res.status(404).json({ error: 'report.json not found for latest run.' });
+    }
+
+    try {
+      const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+
+      const tests = report.tests.map(t => ({
+        label:             t.pair.label,
+        viewport:          t.pair.viewportLabel,
+        status:            t.status,
+        misMatchPercent:   t.pair.misMatchPercent ?? null,
+        misMatchThreshold: t.pair.misMatchThreshold,
+        url:               t.pair.url,
+        referenceUrl:      t.pair.referenceUrl,
+        error:             t.pair.error || t.pair.engineErrorMsg || null,
+        images: {
+          reference: `/backstop_data/bitmaps_reference/${t.pair.fileName}`,
+          test:      `/backstop_data/bitmaps_test/${latestRun}/${t.pair.fileName}`,
+          diff:      `/backstop_data/bitmaps_test/${latestRun}/failed_diff_${t.pair.fileName}`,
+        },
+      }));
+
+      res.json({ id: report.id, timestamp: latestRun, tests });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
 });
 
