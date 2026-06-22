@@ -138,7 +138,7 @@ app.get('/api/report', (req, res) => {
         label:             t.pair.label,
         viewport:          t.pair.viewportLabel,
         status:            t.status,
-        misMatchPercent:   t.pair.misMatchPercent ?? null,
+        misMatchPercent: t.pair.diff ? parseFloat(t.pair.diff.misMatchPercentage) : null,
         misMatchThreshold: t.pair.misMatchThreshold,
         url:               t.pair.url,
         referenceUrl:      t.pair.referenceUrl,

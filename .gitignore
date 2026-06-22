@@ -48,3 +48,9 @@ yarn-error.log*
 # 6. Exclude customizable configuration files
 # ==========================================
 snapscen.config.js
+
+
+# ==========================================
+# 7. Generated files by AI tools
+# ==========================================
+.claude
