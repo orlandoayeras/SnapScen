@@ -223,6 +223,8 @@ function setButtonsDisabled(disabled) {
 function runCommand(command) {
   if (currentSource) currentSource.close();
 
+  let hasMismatch = false;
+
   clearOutput();
   appendOutput(`$ snapscen ${command}\n`, 'line-info');
   setStatus('running', `Running ${command}...`);
@@ -239,11 +241,17 @@ function runCommand(command) {
       if (data.code === 0) {
         appendOutput('\n✓ Completed successfully\n', 'line-success');
         setStatus('success', 'Done');
+      } else if (hasMismatch) {
+          appendOutput('\n◎ Mismatch found — view report to review changes\n', 'line-info');
+          setStatus('running', 'Pending Review');
       } else {
         appendOutput(`\n✗ Exited with code ${data.code}\n`, 'line-error');
         setStatus('error', 'Failed');
       }
     } else {
+      if (data.text && data.text.includes('Mismatch errors found')) {
+        hasMismatch = true;
+      }
       appendOutput(data.text);
     }
   };

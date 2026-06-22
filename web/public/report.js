@@ -82,7 +82,7 @@ function renderScenarios(tests) {
         <div class="page-header">
           <h2>${escHtml(label)}</h2>
           <span class="page-url">${escHtml(url)}</span>
-          <span class="page-badge ${allPass ? 'all-pass' : 'has-fail'}">
+          <span class="page-badge ${allPass ? 'all-pass' : scenarios.some(s => s.status === 'fail' && s.misMatchPercent !== null && !s.error) ? 'has-pending' : 'has-fail'}">
             ${passCount}/${scenarios.length} passed
           </span>
         </div>
@@ -96,21 +96,24 @@ function renderScenarios(tests) {
 }
 
 function scenarioCard(s) {
-  const isError = !!s.error && s.misMatchPercent === null;
+  const isError   = s.status === 'fail' && s.misMatchPercent === null;
+  const isPending = s.status === 'fail' && s.misMatchPercent !== null && !s.error;
+  const cardClass = isPending ? 'pending' : s.status;
+  const badgeText = isPending ? 'Pending Review' : s.status;
   const pct  = s.misMatchPercent !== null ? `${s.misMatchPercent}%` : '—';
   const over = s.misMatchPercent !== null && s.misMatchPercent > s.misMatchThreshold;
 
   const header = `
     <div class="scenario-header">
       <span class="viewport-tag">${escHtml(s.viewport)}</span>
-      <span class="status-badge ${s.status}">${s.status}</span>
+      <span class="status-badge ${cardClass}">${badgeText}</span>
       <span class="mismatch-pct ${over ? 'over' : ''}">${pct}</span>
     </div>`;
 
   if (isError) {
     const msg = (s.error || '').split('\n')[0];
     return `
-      <div class="scenario-card ${s.status}">
+      <div class="scenario-card ${cardClass}">
         ${header}
         <div class="error-body">
           <div class="error-msg">${escHtml(msg)}</div>
@@ -121,7 +124,7 @@ function scenarioCard(s) {
   const showDiff = s.status === 'fail';
 
   return `
-    <div class="scenario-card ${s.status}">
+    <div class="scenario-card ${cardClass}">
       ${header}
       <div class="image-grid">
         ${imagePane('Reference', s.images.reference)}
