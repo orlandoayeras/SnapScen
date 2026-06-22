@@ -33,7 +33,9 @@ function renderSummary(c) {
     </div>
     <div class="config-item">
       <span class="config-label">Viewports</span>
-      <span class="config-value">${(c.viewports || []).map(v => v.label).join(', ') || '—'}</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        ${(c.viewports || []).map(v => `<span class="config-value">${v.label}</span>`).join('')}
+      </div>
     </div>
     <div class="config-item">
       <span class="config-label">Pages</span>
