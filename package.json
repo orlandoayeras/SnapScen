@@ -9,7 +9,7 @@
     "approve": "backstop --config=backstop.config.js approve",
     "open-report": "backstop --config=backstop.config.js open-report",
     "vrt": "npm run reference && npm run test",
-    "dev": "node web.server.js"
+    "dev": "node web/server.js"
   },
   "repository": {
     "type": "git",
@@ -26,7 +26,8 @@
     "backstopjs": "^6.3.25"
   },
   "dependencies": {
-    "commander": "^15.0.0"
+    "commander": "^15.0.0",
+    "express": "^5.2.1"
   },
   "bin": {
     "snapscen": "cli/index.js"
