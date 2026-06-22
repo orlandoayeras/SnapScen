@@ -1,3 +1,4 @@
+const fs = require('fs');
 const express = require('express');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -11,6 +12,7 @@ const snapscenConfigPath = path.resolve(__dirname, '..', 'snapscen.config.js');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/report', express.static(path.resolve(__dirname, '..', 'backstop_data', 'html_report')));
+app.use(express.json());
 
 app.get('/api/config', (req, res) => {
     try {
@@ -67,6 +69,42 @@ app.get('/api/run/:command', (req, res) => {
     child.stderr.on('data', d => send('stderr', d.toString()));
     child.on('close', done);
     req.on('close', () => child.kill());
+});
+
+function serializeConfig(c) {
+    const viewportsStr = JSON.stringify(c.viewports, null, 2).split('\n').join('\n    ');
+    const pageLines = (c.pages || []).map(p => {
+        const threshold = typeof p.misMatchThreshold === 'number' ? `, misMatchThreshold: ${p.misMatchThreshold}` : '';
+        return `{
+            path: ${JSON.stringify(p.path)},
+            label: ${JSON.stringify(p.label)}${threshold}
+        },`;
+    }).join('\n');
+
+    return [
+        '// snapscen.config.js',
+        'module.exports = {',
+        `    id: ${JSON.stringify(c.id)},`,
+        `    referenceBase: ${JSON.stringify(c.referenceBase)},`,
+        `    targetBase: ${JSON.stringify(c.targetBase)},`,
+        `    misMatchThreshold: ${c.misMatchThreshold},`,
+        `    viewports: ${viewportsStr},`,
+        `    pages: [`,
+        pageLines,
+        `    ]`,
+        `};`,
+        '',
+    ].join('\n');
+}
+
+app.post('/api/config', (req, res) => {
+    try {
+        fs.writeFileSync(snapscenConfigPath, serializeConfig(req.body), 'utf-8');
+        delete require.cache[require.resolve(snapscenConfigPath)];
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.listen(PORT, () => console.log(`SnapScen server running at http://localhost:${PORT}`));
