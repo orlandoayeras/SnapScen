@@ -40,9 +40,6 @@
       color: var(--muted);
       text-decoration: none;
       font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
       transition: color 0.15s;
     }
 
@@ -62,11 +59,7 @@
     }
 
     /* Stats */
-    .stats-bar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
+    .stats-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
 
     .stat-pill {
       background: var(--surface);
@@ -87,21 +80,13 @@
       font-weight: 600;
     }
 
-    .stat-pill-value {
-      font-size: 1.4rem;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .stat-pill-value.pass { color: var(--success); }
-    .stat-pill-value.fail { color: var(--danger); }
+    .stat-pill-value    { font-size: 1.4rem; font-weight: 700; line-height: 1; }
+    .stat-pill-value.pass    { color: var(--success); }
+    .stat-pill-value.pending { color: var(--warning); }
+    .stat-pill-value.fail    { color: var(--danger);  }
 
     /* Filters */
-    .filters {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 20px;
-    }
+    .filters { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
 
     .filter-btn {
       background: var(--surface);
@@ -115,208 +100,361 @@
     }
 
     .filter-btn:hover { color: var(--text); border-color: var(--text); }
-    .filter-btn.active      { background: var(--accent);  border-color: var(--accent);  color: white; }
-    .filter-btn.active-pass { background: var(--success); border-color: var(--success); color: white; }
-    .filter-btn.active-fail { background: var(--danger);  border-color: var(--danger);  color: white; }
+    .filter-btn.active-all     { background: var(--accent);  border-color: var(--accent);  color: white; }
+    .filter-btn.active-pass    { background: var(--success); border-color: var(--success); color: white; }
+    .filter-btn.active-pending { background: var(--warning); border-color: var(--warning); color: white; }
+    .filter-btn.active-fail    { background: var(--danger);  border-color: var(--danger);  color: white; }
 
-    /* Page sections */
-    .page-section { margin-bottom: 32px; }
+    /* Viewport sections */
+    .viewport-section { margin-bottom: 32px; }
 
-    .page-header {
+    .viewport-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
+      gap: 10px;
+      padding: 10px 0;
+      cursor: pointer;
+      user-select: none;
       border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
     }
 
-    .page-header h2 { font-size: 1rem; font-weight: 600; }
+    .viewport-toggle { color: var(--muted); font-size: 0.7rem; display: inline-block; }
+    .viewport-name   { font-size: 1rem; font-weight: 600; }
+    .viewport-count  { font-size: 0.8rem; color: var(--muted); }
 
-    .page-url {
-      font-size: 0.75rem;
-      color: var(--muted);
-      font-family: 'SF Mono', monospace;
-    }
-
-    .page-badge {
-      margin-left: auto;
-      font-size: 0.75rem;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .page-badge.all-pass { background: rgba(34,197,94,0.15); color: var(--success); }
-    .page-badge.has-fail { background: rgba(239,68,68,0.15);  color: var(--danger);  }
-
-    /* Scenario cards */
+    /* Card grid */
     .viewport-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.2s;
+      max-height: 9999px;
+      opacity: 1;
     }
 
+    .viewport-grid.collapsed { max-height: 0; opacity: 0; }
+
+    /* Scenario card */
     .scenario-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .scenario-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+    }
+
+    .scenario-card.pass    { border-color: rgba(34,197,94,0.25); }
+    .scenario-card.pending { border-color: rgba(245,158,11,0.45); }
+    .scenario-card.fail    { border-color: rgba(239,68,68,0.45);  }
+
+    .card-thumb {
+      position: relative;
+      aspect-ratio: 16 / 11;
+      background: var(--bg);
       overflow: hidden;
     }
 
-    .scenario-card.fail { border-color: rgba(239,68,68,0.4); }
-    .scenario-card.pass { border-color: rgba(34,197,94,0.2); }
-
-    .scenario-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .viewport-tag {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 2px 8px;
-      border-radius: 4px;
-      color: var(--muted);
-    }
-
-    .status-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    .status-badge.pass { background: rgba(34,197,94,0.15); color: var(--success); }
-    .status-badge.fail { background: rgba(239,68,68,0.15);  color: var(--danger);  }
-    .status-badge.pending { background: rgba(245,158,11,0.15); color: var(--warning); }
-    .scenario-card.pending { border-color: rgba(245,158,11,0.35); }
-    .page-badge.has-pending { background: rgba(245,158,11,0.15); color: var(--warning); }
-
-    .mismatch-pct {
-      margin-left: auto;
-      font-size: 0.8rem;
-      font-family: 'SF Mono', monospace;
-      color: var(--muted);
-    }
-
-    .mismatch-pct.over { color: var(--danger); }
-
-    /* Image grid */
-    .image-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 1px;
-      background: var(--border);
-    }
-
-    .image-pane {
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .pane-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      padding: 6px 8px 4px;
-      font-weight: 600;
-    }
-
-    .pane-img {
+    .card-thumb img {
       width: 100%;
-      display: block;
-      cursor: zoom-in;
-      transition: opacity 0.15s;
-      max-height: 160px;
+      height: 100%;
       object-fit: cover;
       object-position: top;
+      display: block;
     }
 
-    .pane-img:hover { opacity: 0.85; }
-
-    .pane-missing {
+    .card-no-image {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 80px;
-      font-size: 0.72rem;
+      height: 100%;
+      font-size: 0.75rem;
       color: var(--muted);
       font-style: italic;
     }
 
-    /* Error card */
-    .error-body { padding: 14px; }
-
-    .error-msg {
-      font-size: 0.75rem;
-      color: var(--danger);
-      font-family: 'SF Mono', monospace;
-      line-height: 1.5;
-      white-space: pre-wrap;
-      word-break: break-word;
-      max-height: 80px;
-      overflow-y: auto;
+    .card-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 5px;
     }
+
+    .card-badge.pass    { background: rgba(34,197,94,0.85);  color: white; }
+    .card-badge.pending { background: rgba(245,158,11,0.92); color: white; }
+    .card-badge.fail    { background: rgba(239,68,68,0.92);  color: white; }
+
+    .card-info    { padding: 10px 12px 12px; }
+    .card-label   { font-size: 0.875rem; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-url     { font-size: 0.7rem; color: var(--muted); font-family: 'SF Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* Empty state */
-    .empty-state {
-      text-align: center;
-      padding: 60px 24px;
-      color: var(--muted);
-    }
-
+    .empty-state { text-align: center; padding: 60px 24px; color: var(--muted); }
     .empty-state p { margin-top: 8px; font-size: 0.875rem; }
 
-    /* Lightbox */
+    /* ─── Lightbox ─────────────────────────────────────────────────── */
+
     .lightbox {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.92);
+      background: rgba(0,0,0,0.75);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 200;
-      padding: 24px;
+      padding: 16px;
     }
 
     .lightbox.open { display: flex; }
 
-    .lightbox img {
-      max-width: 100%;
-      max-height: 90vh;
-      object-fit: contain;
-      border-radius: 4px;
+    .lb-panel {
+      background: white;
+      border-radius: 12px;
+      width: 96vw;
+      max-width: 1500px;
+      height: 93vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+      color: #1a202c;
     }
 
-    .lightbox-close {
-      position: fixed;
-      top: 20px;
-      right: 24px;
+    /* Header */
+    .lb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      flex-shrink: 0;
+      gap: 12px;
+    }
+
+    .lb-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .lb-page  { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lb-sep   { color: #94a3b8; flex-shrink: 0; }
+    .lb-vp    { color: #64748b; font-size: 0.8rem; flex-shrink: 0; text-transform: capitalize; }
+
+    .lb-pct {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .lb-pct.pending { background: #f59e0b; }
+    .lb-pct.fail    { background: #ef4444; }
+    .lb-pct.pass    { background: #22c55e; }
+
+    .lb-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    .lb-mode-group {
+      display: flex;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .lb-mode-btn {
       background: none;
       border: none;
-      color: white;
-      font-size: 1.5rem;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #64748b;
       cursor: pointer;
-      padding: 4px 10px;
-      border-radius: 4px;
-      opacity: 0.7;
-      transition: opacity 0.15s;
+      transition: all 0.15s;
+      white-space: nowrap;
     }
 
-    .lightbox-close:hover { opacity: 1; }
+    .lb-mode-btn.active { background: white; color: #1a202c; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .lb-mode-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .lb-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+
+    .lb-close:hover { color: #1a202c; }
+
+    /* Views */
+    .lb-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    .lb-view.hidden { display: none; }
+
+    /* Color bar */
+    .lb-color-bar { display: flex; height: 4px; flex-shrink: 0; }
+    .lb-bar-ref   { background: #e04040; }
+    .lb-bar-test  { background: #4060e0; flex: 1; }
+
+    /* Slider */
+    .comparison-wrap {
+      position: relative;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      cursor: col-resize;
+      background: #f0f2f5;
+      min-height: 0;
+    }
+
+    /* Inner container — sets scroll height from natural image size */
+    .comparison-inner {
+      position: relative;
+      width: 100%;
+    }
+
+    /* Test image in normal flow — determines the inner height */
+    .comp-base-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Reference image overlaid on top, clipped to the left */
+    .comp-ref {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 2;
+      clip-path: inset(0 50% 0 0);
+      pointer-events: none;
+    }
+
+    .comp-ref img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .comp-handle {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 3px;
+      height: 100%;
+      background: #e8c840;
+      z-index: 4;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    /* Sticky labels stay visible while scrolling */
+    .comp-labels {
+      position: sticky;
+      top: 10px;
+      z-index: 6;
+      height: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+      pointer-events: none;
+    }
+
+    .img-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: rgba(0,0,0,0.55);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.08em;
+      align-self: flex-start;
+    }
+
+    /* Side */
+    .side-container {
+      display: flex;
+      gap: 1px;
+      flex: 1;
+      overflow-y: auto;
+      background: #e2e8f0;
+      min-height: 0;
+    }
+
+    .side-pane { flex: 1; background: #f8fafc; overflow: hidden; }
+
+    .side-pane-label {
+      position: sticky;
+      top: 0;
+      background: rgba(248,250,252,0.96);
+      border-bottom: 1px solid #e2e8f0;
+      padding: 6px 14px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+
+    .side-pane img { width: 100%; height: auto; display: block; }
+
+    /* Diff */
+    .diff-container {
+      flex: 1;
+      overflow: auto;
+      background: #f0f2f5;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    .diff-container img { width: 100%; height: auto; display: block; }
+
+    .diff-missing {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      color: #94a3b8;
+      font-size: 0.875rem;
+    }
+
+    /* Footer */
+    .lb-footer {
+      display: flex;
+      gap: 24px;
+      padding: 8px 20px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.7rem;
+      color: #64748b;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .lb-footer a { color: #3b82f6; text-decoration: none; }
+    .lb-footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -331,16 +469,87 @@
   <div class="stats-bar" id="stats-bar"></div>
 
   <div class="filters">
-    <button class="filter-btn active" data-filter="all"  onclick="setFilter('all')">All</button>
-    <button class="filter-btn"        data-filter="pass" onclick="setFilter('pass')">Passed</button>
-    <button class="filter-btn"        data-filter="fail" onclick="setFilter('fail')">Failed</button>
+    <button class="filter-btn active-all" data-filter="all"     onclick="setFilter('all')">All</button>
+    <button class="filter-btn"            data-filter="pass"    onclick="setFilter('pass')">Passed</button>
+    <button class="filter-btn"            data-filter="pending" onclick="setFilter('pending')">Pending Review</button>
+    <button class="filter-btn"            data-filter="fail"    onclick="setFilter('fail')">Failed</button>
   </div>
 
   <div id="report-content"></div>
 
-  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-    <img id="lightbox-img" src="" alt="" />
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lb-panel">
+
+      <!-- Header -->
+      <div class="lb-header">
+        <div class="lb-meta">
+          <span class="lb-page" id="lb-page"></span>
+          <span class="lb-sep">·</span>
+          <span class="lb-vp" id="lb-vp"></span>
+          <span class="lb-sep" id="lb-sep-pct">·</span>
+          <span class="lb-pct" id="lb-pct"></span>
+        </div>
+        <div class="lb-controls">
+          <div class="lb-mode-group">
+            <button class="lb-mode-btn" data-mode="side"   onclick="setMode('side')">Side</button>
+            <button class="lb-mode-btn active" data-mode="slider" onclick="setMode('slider')">Slider</button>
+            <button class="lb-mode-btn" data-mode="diff"   onclick="setMode('diff')" id="btn-diff">Diff</button>
+          </div>
+          <button class="lb-close" onclick="closeLightbox()">✕</button>
+        </div>
+      </div>
+
+      <!-- Slider view -->
+      <div class="lb-view" id="view-slider">
+        <div class="lb-color-bar">
+          <div class="lb-bar-ref" id="lb-bar-ref" style="width:50%"></div>
+          <div class="lb-bar-test"></div>
+        </div>
+        <div class="comparison-wrap" id="comparison-wrap">
+          <div class="comp-labels">
+            <span class="img-label">REF</span>
+            <span class="img-label">TEST</span>
+          </div>
+          <div class="comparison-inner">
+            <img class="comp-base-img" id="lb-test-s" src="" alt="Test" />
+            <div class="comp-ref" id="comp-ref">
+              <img id="lb-ref-s" src="" alt="Reference" />
+            </div>
+            <div class="comp-handle" id="comp-handle"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side view -->
+      <div class="lb-view hidden" id="view-side">
+        <div class="side-container" id="side-container">
+          <div class="side-pane">
+            <div class="side-pane-label">REFERENCE</div>
+            <img id="lb-ref-p" src="" alt="Reference" />
+          </div>
+          <div class="side-pane">
+            <div class="side-pane-label">TEST</div>
+            <img id="lb-test-p" src="" alt="Test" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Diff view -->
+      <div class="lb-view hidden" id="view-diff">
+        <div class="diff-container" id="diff-container">
+          <img id="lb-diff" src="" alt="Diff" style="display:none" />
+          <div class="diff-missing" id="diff-missing">No diff image available</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="lb-footer">
+        <span>REF <a id="lb-ref-url" href="#" target="_blank" rel="noopener"></a></span>
+        <span>TEST <a id="lb-test-url" href="#" target="_blank" rel="noopener"></a></span>
+      </div>
+
+    </div>
   </div>
 
   <script src="report.js"></script>
