@@ -1,106 +1,259 @@
+let config = null;
 let currentSource = null;
 
-  async function loadConfig() {
-    try {
-      const res = await fetch('/api/config');
-      const config = await res.json();
-      renderConfig(config);
-    } catch {
-      document.getElementById('config-content').textContent = 'Failed to load config.';
-    }
+// ─── Config ───────────────────────────────────────────────────────
+
+async function loadConfig() {
+  try {
+    const res = await fetch('/api/config');
+    config = await res.json();
+    renderSummary(config);
+  } catch {
+    document.getElementById('config-content').textContent = 'Failed to load config.';
   }
+}
 
-  function renderConfig(config) {
-    const pages = (config.pages || []);
-    const viewports = (config.viewports || []).map(v => v.label).join(', ');
+function renderSummary(c) {
+  document.getElementById('config-content').innerHTML = `
+    <div class="config-item">
+      <span class="config-label">ID</span>
+      <span class="config-value">${c.id || '—'}</span>
+    </div>
+    <div class="config-item">
+      <span class="config-label">Reference</span>
+      <span class="config-value">${c.referenceBase || '—'}</span>
+    </div>
+    <div class="config-item">
+      <span class="config-label">Target</span>
+      <span class="config-value">${c.targetBase || '—'}</span>
+    </div>
+    <div class="config-item">
+      <span class="config-label">Threshold</span>
+      <span class="config-value">${c.misMatchThreshold ?? 1.0}%</span>
+    </div>
+    <div class="config-item">
+      <span class="config-label">Viewports</span>
+      <span class="config-value">${(c.viewports || []).map(v => v.label).join(', ') || '—'}</span>
+    </div>
+    <div class="config-item">
+      <span class="config-label">Pages</span>
+      <span class="config-value">${(c.pages || []).length} configured</span>
+    </div>
+  `;
+}
 
-    document.getElementById('config-content').innerHTML = `
-      <div class="config-item">
-        <span class="config-label">ID</span>
-        <span class="config-value">${config.id || '—'}</span>
+// ─── Modal ────────────────────────────────────────────────────────
+
+function openModal() {
+  renderSettingsTab(config);
+  renderPagesTab(config);
+  switchTab('settings');
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-settings').style.display = tab === 'settings' ? 'block' : 'none';
+  document.getElementById('tab-pages').style.display = tab === 'pages' ? 'block' : 'none';
+  document.querySelectorAll('.modal-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+}
+
+// ─── Settings Tab ─────────────────────────────────────────────────
+
+function renderSettingsTab(c) {
+  document.getElementById('tab-settings').innerHTML = `
+    <div class="form-group">
+      <label>Site ID</label>
+      <input class="form-input" id="field-id" type="text" value="${c.id || ''}" />
+    </div>
+    <div class="form-group">
+      <label>Reference Base URL</label>
+      <input class="form-input" id="field-referenceBase" type="url" value="${c.referenceBase || ''}" />
+    </div>
+    <div class="form-group">
+      <label>Target Base URL</label>
+      <input class="form-input" id="field-targetBase" type="url" value="${c.targetBase || ''}" />
+    </div>
+    <div class="form-group">
+      <label>Default Threshold (%)</label>
+      <input class="form-input" id="field-threshold" type="number" value="${c.misMatchThreshold ?? 1.0}" min="0" max="100" step="0.1" style="width:120px;" />
+    </div>
+    <div class="form-group">
+      <label>Viewports</label>
+      <div class="row-header">
+        <span style="flex:1.5">Label</span>
+        <span style="width:90px">Width</span>
+        <span style="width:90px">Height</span>
       </div>
-      <div class="config-item">
-        <span class="config-label">Reference</span>
-        <span class="config-value">${config.referenceBase || '—'}</span>
+      <div id="viewports-list">
+        ${(c.viewports || []).map((v, i) => viewportRow(v, i)).join('')}
       </div>
-      <div class="config-item">
-        <span class="config-label">Target</span>
-        <span class="config-value">${config.targetBase || '—'}</span>
-      </div>
-      <div class="config-item">
-        <span class="config-label">Threshold</span>
-        <span class="config-value">${config.misMatchThreshold ?? 1.0}%</span>
-      </div>
-      <div class="config-item">
-        <span class="config-label">Viewports</span>
-        <span class="config-value">${viewports || '—'}</span>
-      </div>
-      <div class="config-item" style="flex-direction:column;gap:8px;">
-        <span class="config-label">Pages (${pages.length})</span>
-        <div class="pages-list">
-          ${pages.map(p => `<span class="page-tag">${p.path} — ${p.label}</span>`).join('')}
-        </div>
-      </div>
-    `;
-  }
+      <button class="btn-add" onclick="addViewport()">+ Add Viewport</button>
+    </div>
+  `;
+}
 
-  function setStatus(state, text) {
-    document.getElementById('status-dot').className = `status-dot ${state}`;
-    document.getElementById('status-text').textContent = text;
-  }
+function viewportRow(v, i) {
+  return `
+    <div class="viewport-row" id="vp-${i}">
+      <input class="form-input vp-label" type="text" placeholder="Label" value="${v.label}" />
+      <input class="form-input vp-dim" type="number" placeholder="Width" value="${v.width}" />
+      <input class="form-input vp-dim" type="number" placeholder="Height" value="${v.height}" />
+      <button class="btn-remove" onclick="this.closest('.viewport-row').remove()">✕</button>
+    </div>`;
+}
 
-  function appendOutput(text, className = '') {
-    const output = document.getElementById('output');
-    const span = document.createElement('span');
-    if (className) span.className = className;
-    span.textContent = text;
-    output.appendChild(span);
-    output.scrollTop = output.scrollHeight;
-  }
+function addViewport() {
+  const list = document.getElementById('viewports-list');
+  const i = list.children.length;
+  list.insertAdjacentHTML('beforeend', viewportRow({ label: '', width: 1440, height: 900 }, i));
+}
 
-  function clearOutput() {
-    document.getElementById('output').innerHTML = '';
-    setStatus('', 'Ready');
-  }
+// ─── Pages Tab ────────────────────────────────────────────────────
 
-  function setButtonsDisabled(disabled) {
-    document.querySelectorAll('.btn').forEach(btn => btn.disabled = disabled);
-  }
+function renderPagesTab(c) {
+  document.getElementById('tab-pages').innerHTML = `
+    <div class="row-header">
+      <span style="flex:1.2">Path</span>
+      <span style="flex:1.5">Label</span>
+      <span style="width:90px">Threshold</span>
+    </div>
+    <div id="pages-list">
+      ${(c.pages || []).map((p, i) => pageRow(p, i)).join('')}
+    </div>
+    <button class="btn-add" onclick="addPage()">+ Add Page</button>
+  `;
+}
 
-  function runCommand(command) {
-    if (currentSource) currentSource.close();
+function pageRow(p, i) {
+  const threshold = typeof p.misMatchThreshold === 'number' ? p.misMatchThreshold : '';
+  return `
+    <div class="page-row" id="pg-${i}">
+      <input class="form-input path" type="text" placeholder="/path" value="${p.path}" />
+      <input class="form-input label" type="text" placeholder="Label" value="${p.label}" />
+      <input class="form-input threshold" type="number" placeholder="—" value="${threshold}" min="0" max="100" step="0.1" />
+      <button class="btn-remove" onclick="this.closest('.page-row').remove()">✕</button>
+    </div>`;
+}
 
-    clearOutput();
-    appendOutput(`$ snapscen ${command}\n`, 'line-info');
-    setStatus('running', `Running ${command}...`);
-    setButtonsDisabled(true);
+function addPage() {
+  const list = document.getElementById('pages-list');
+  const i = list.children.length;
+  list.insertAdjacentHTML('beforeend', pageRow({ path: '', label: '' }, i));
+}
 
-    currentSource = new EventSource(`/api/run/${command}`);
+// ─── Save ─────────────────────────────────────────────────────────
 
-    currentSource.onmessage = e => {
-      const data = JSON.parse(e.data);
-      if (data.type === 'done') {
-        currentSource.close();
-        currentSource = null;
-        setButtonsDisabled(false);
-        if (data.code === 0) {
-          appendOutput('\n✓ Completed successfully\n', 'line-success');
-          setStatus('success', 'Done');
-        } else {
-          appendOutput(`\n✗ Exited with code ${data.code}\n`, 'line-error');
-          setStatus('error', 'Failed');
-        }
-      } else {
-        appendOutput(data.text);
-      }
+function collectFormData() {
+  const viewports = [...document.querySelectorAll('#viewports-list .viewport-row')].map(row => ({
+    label: row.querySelector('.vp-label').value.trim(),
+    width: parseInt(row.querySelectorAll('.vp-dim')[0].value),
+    height: parseInt(row.querySelectorAll('.vp-dim')[1].value),
+  })).filter(v => v.label);
+
+  const pages = [...document.querySelectorAll('#pages-list .page-row')].map(row => {
+    const t = row.querySelector('.threshold').value;
+    const page = {
+      path: row.querySelector('.path').value.trim(),
+      label: row.querySelector('.label').value.trim(),
     };
+    if (t !== '') page.misMatchThreshold = parseFloat(t);
+    return page;
+  }).filter(p => p.path);
 
-    currentSource.onerror = () => {
+  return {
+    id: document.getElementById('field-id').value.trim(),
+    referenceBase: document.getElementById('field-referenceBase').value.trim(),
+    targetBase: document.getElementById('field-targetBase').value.trim(),
+    misMatchThreshold: parseFloat(document.getElementById('field-threshold').value),
+    viewports,
+    pages,
+  };
+}
+
+async function saveConfig() {
+  const updated = collectFormData();
+  try {
+    const res = await fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated),
+    });
+    if (!res.ok) throw new Error('Save failed');
+    config = updated;
+    renderSummary(config);
+    closeModal();
+  } catch (err) {
+    alert(`Failed to save config: ${err.message}`);
+  }
+}
+
+// ─── Commands ─────────────────────────────────────────────────────
+
+function setStatus(state, text) {
+  document.getElementById('status-dot').className = `status-dot ${state}`;
+  document.getElementById('status-text').textContent = text;
+}
+
+function appendOutput(text, className = '') {
+  const output = document.getElementById('output');
+  const span = document.createElement('span');
+  if (className) span.className = className;
+  span.textContent = text;
+  output.appendChild(span);
+  output.scrollTop = output.scrollHeight;
+}
+
+function clearOutput() {
+  document.getElementById('output').innerHTML = '';
+  setStatus('', 'Ready');
+}
+
+function setButtonsDisabled(disabled) {
+  document.querySelectorAll('.btn').forEach(btn => btn.disabled = disabled);
+}
+
+function runCommand(command) {
+  if (currentSource) currentSource.close();
+
+  clearOutput();
+  appendOutput(`$ snapscen ${command}\n`, 'line-info');
+  setStatus('running', `Running ${command}...`);
+  setButtonsDisabled(true);
+
+  currentSource = new EventSource(`/api/run/${command}`);
+
+  currentSource.onmessage = e => {
+    const data = JSON.parse(e.data);
+    if (data.type === 'done') {
       currentSource.close();
       currentSource = null;
       setButtonsDisabled(false);
-      setStatus('error', 'Connection error');
-    };
+      if (data.code === 0) {
+        appendOutput('\n✓ Completed successfully\n', 'line-success');
+        setStatus('success', 'Done');
+      } else {
+        appendOutput(`\n✗ Exited with code ${data.code}\n`, 'line-error');
+        setStatus('error', 'Failed');
+      }
+    } else {
+      appendOutput(data.text);
+    }
+  };
+
+  currentSource.onerror = () => {
+    currentSource.close();
+    currentSource = null;
+    setButtonsDisabled(false);
+    setStatus('error', 'Connection error');
+  };
 }
+
+// ─── Init ─────────────────────────────────────────────────────────
 
 loadConfig();
